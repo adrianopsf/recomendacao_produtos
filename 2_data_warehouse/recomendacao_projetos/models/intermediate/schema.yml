@@ -1,0 +1,8 @@
+version: 2
+models:
+  - name: products_clean
+    columns:
+      - name: product_id
+        tests: [not_null, unique]
+      - name: title
+        tests: [not_null]

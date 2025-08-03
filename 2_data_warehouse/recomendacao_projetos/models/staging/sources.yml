@@ -1,0 +1,10 @@
+version: 2
+sources:
+  - name: bronze
+    schema: bronze
+    tables:
+      - name: products_raw
+        description: "Carga bruta de produtos (Fake Store API)."
+        columns:
+          - name: product_id
+            tests: [not_null, unique]

@@ -1,0 +1,8 @@
+version: 2
+models:
+  - name: products_for_embedding
+    columns:
+      - name: product_id
+        tests: [not_null, unique]
+      - name: full_text
+        tests: [not_null]
