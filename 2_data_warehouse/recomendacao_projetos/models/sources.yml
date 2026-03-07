@@ -1,0 +1,31 @@
+version: 2
+
+sources:
+  - name: bronze
+    schema: bronze
+    description: "Camada bronze — dados brutos ingeridos da Fake Store API"
+    tables:
+      - name: products_raw
+        description: "Produtos brutos da Fake Store API (20 itens)"
+        columns:
+          - name: product_id
+            description: "Identificador único do produto"
+            tests:
+              - unique
+              - not_null
+          - name: title
+            description: "Nome do produto"
+            tests:
+              - not_null
+          - name: description
+            description: "Descrição detalhada do produto"
+          - name: category
+            description: "Categoria do produto"
+          - name: price
+            description: "Preço do produto em USD"
+          - name: image
+            description: "URL da imagem do produto"
+          - name: rating_rate
+            description: "Nota média (0–5)"
+          - name: rating_count
+            description: "Total de avaliações"
