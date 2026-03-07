@@ -1,0 +1,34 @@
+version: 2
+
+models:
+  - name: stg_products
+    description: |
+      View de staging sobre bronze.products_raw.
+      Aplica limpeza de texto, normalização de categoria e tipagem
+      explícita. Não realiza joins nem cálculos de negócio.
+    columns:
+      - name: product_id
+        description: "Identificador único do produto (PK)"
+        tests:
+          - unique
+          - not_null
+      - name: title
+        description: "Nome do produto (trim aplicado)"
+        tests:
+          - not_null
+      - name: description
+        description: "Descrição detalhada do produto (trim aplicado)"
+      - name: category
+        description: "Categoria em minúsculas e sem espaços extras"
+      - name: price
+        description: "Preço em USD, arredondado a 2 casas decimais"
+        tests:
+          - not_null
+      - name: image
+        description: "URL da imagem do produto"
+      - name: rating_rate
+        description: "Nota média (0.0–5.0)"
+      - name: rating_count
+        description: "Total de avaliações"
+      - name: _loaded_at
+        description: "Timestamp de quando o registro foi processado pelo dbt"
