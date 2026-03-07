@@ -110,18 +110,8 @@ cd recomendacao_produtos
 ### 2. Configure as variáveis de ambiente
 
 ```bash
-# Em 1_local_setup/, crie o arquivo .env:
-cp 1_local_setup/.env.example 1_local_setup/.env
-```
-
-Edite o `.env` com suas credenciais:
-
-```env
-DBT_USER=postgres
-DBT_PASSWORD=sua_senha_segura
-DBT_HOST=localhost
-DBT_PORT=5433
-DBT_DB=dbt_db
+cp .env.example .env
+# Edite o .env com suas credenciais
 ```
 
 ### 3. Suba o banco de dados
@@ -251,7 +241,7 @@ curl "http://localhost:8001/similar/3?k=5"
 
 ## 🔍 Avaliação End-to-End
 
-> Análise da viabilidade de execução completa do pipeline.
+> Análise da viabilidade de execução completa do pipeline — atualizada após correções.
 
 ### ✅ O que funciona
 
@@ -261,40 +251,23 @@ curl "http://localhost:8001/similar/3?k=5"
 | `fakestore_get_data.py` | ✅ | Upsert idempotente, schema bronze correto |
 | `build_index.py` | ✅ | Embeddings e índice gerados corretamente |
 | `api/main.py` | ✅ | Endpoints `/search`, `/similar`, `/health` funcionais |
-| Dependências | ✅ | `pyproject.toml` completo para os módulos existentes |
+| Dependências | ✅ | `fastapi`, `uvicorn`, `joblib`, `httpx` adicionados ao `pyproject.toml` |
+| `.env.example` | ✅ | Template com credenciais dbt criado |
 
-### ⚠️ Pontos de atenção
+### ⚠️ Pontos de atenção (restantes)
 
 | Problema | Severidade | Recomendação |
 |---------|-----------|-------------|
 | **Modelos dbt não versionados** | 🔴 Alta | Adicionar arquivos `.sql` do dbt ao repositório; a tabela gold não é criada sem eles |
-| **FastAPI ausente no `pyproject.toml`** | 🔴 Alta | Adicionar `fastapi>=0.100`, `uvicorn`, `joblib` às dependências |
-| **Sem `.env.example`** | 🟡 Média | Criar template de variáveis de ambiente para facilitar onboarding |
 | **Sem testes automatizados** | 🟡 Média | Adicionar testes para a API com `pytest` + `httpx` |
 | **Step numerado como "4"** | 🟢 Baixa | Renomear para `3_embeddings` para manter consistência sequencial |
 | **Sem `__init__.py` em `api/`** | 🟢 Baixa | Pode causar problemas de importação em alguns ambientes |
 
 ---
 
-## 🛠️ Problemas Conhecidos e Melhorias
+## 🛠️ Melhorias Futuras
 
-### Correções prioritárias
-
-```bash
-# 1. Adicionar FastAPI ao pyproject.toml
-# Em 1_local_setup/pyproject.toml, adicionar:
-# "fastapi>=0.100.0",
-# "uvicorn>=0.24.0",
-# "joblib>=1.3.0",
-
-# 2. Adicionar modelos dbt ao repositório
-# Criar: 2_data_warehouse/recomendacao_projetos/models/gold/products_for_embedding.sql
-
-# 3. Criar .env.example com as variáveis necessárias
-```
-
-### Melhorias futuras
-
+- [ ] Adicionar modelos dbt ao repositório (bloqueio principal para execução end-to-end)
 - [ ] Adicionar Docker Compose completo (PostgreSQL + API juntos)
 - [ ] Implementar cache para embeddings de queries repetidas
 - [ ] Suporte a re-indexação incremental (novos produtos)
@@ -302,6 +275,7 @@ curl "http://localhost:8001/similar/3?k=5"
 - [ ] Integrar DuckDB para análises ad-hoc locais
 - [ ] CI/CD com GitHub Actions
 - [ ] Dockerfile para a API de embeddings
+- [ ] Testes automatizados com `pytest` + `httpx`
 
 ---
 
