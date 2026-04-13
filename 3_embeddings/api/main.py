@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import os
 import threading
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Optional
 
@@ -34,8 +35,15 @@ _env_file = str(ENV_PATH) if ENV_PATH.exists() else find_dotenv()
 if _env_file:
     load_dotenv(_env_file)
 
+
 # ── app ───────────────────────────────────────────────────────────────────────
-app = FastAPI(title="Recomendador por Embeddings", version="0.2.0")
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    _load_from_disk()
+    yield
+
+
+app = FastAPI(title="Recomendador por Embeddings", version="0.2.0", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -167,12 +175,6 @@ def _make_item(row: dict, dist: float) -> ItemOut:
         image=(str(row["image"]) if pd.notna(row.get("image")) else None),
         score=round(max(0.0, 1.0 - float(dist)), 4),
     )
-
-
-# ── lifecycle ─────────────────────────────────────────────────────────────────
-@app.on_event("startup")
-def startup():
-    _load_from_disk()
 
 
 # ── endpoints ─────────────────────────────────────────────────────────────────

@@ -153,8 +153,10 @@ def test_analytics_module(artifacts_dir):
     import sys
     from pathlib import Path
 
-    sys.path.insert(0, str(Path(__file__).parent.parent))
-    from analytics import analytics  # noqa: PLC0415
+    # 4_analytics começa com dígito; não é importável como pacote diretamente.
+    # Adicionamos o diretório ao sys.path para importar analytics.py como módulo.
+    sys.path.insert(0, str(Path(__file__).parent.parent / "4_analytics"))
+    import analytics  # noqa: PLC0415
 
     meta_path = artifacts_dir / "meta.csv"
 
