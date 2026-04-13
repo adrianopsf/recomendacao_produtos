@@ -78,7 +78,7 @@ recomendacao_produtos/
 │   ├── recomendacao_projetos/  # Modelos dbt (Bronze → Gold)
 │   └── logs/                   # Logs do dbt
 │
-└── 4_embeddings/               # Sistema de embeddings e API
+└── 3_embeddings/               # Sistema de embeddings e API
     ├── build_index.py          # Gera embeddings e índice NN
     ├── artifacts/              # Artefatos gerados (embeddings, model)
     └── api/
@@ -110,8 +110,8 @@ cd recomendacao_produtos
 ### 2. Configure as variáveis de ambiente
 
 ```bash
-cp .env.example .env
-# Edite o .env com suas credenciais
+cp .env.example 1_local_setup/.env
+# Edite o 1_local_setup/.env com suas credenciais
 ```
 
 ### 3. Suba o banco de dados
@@ -151,7 +151,7 @@ Cria a view/table `public_gold.products_for_embedding`.
 ### 7. Gere os embeddings
 
 ```bash
-cd 4_embeddings
+cd 3_embeddings
 python build_index.py
 ```
 
@@ -163,7 +163,7 @@ Gera em `artifacts/`:
 ### 8. Suba a API
 
 ```bash
-cd 4_embeddings
+cd 3_embeddings
 uvicorn api.main:app --reload --port 8001
 ```
 
@@ -251,23 +251,20 @@ curl "http://localhost:8001/similar/3?k=5"
 | `fakestore_get_data.py` | ✅ | Upsert idempotente, schema bronze correto |
 | `build_index.py` | ✅ | Embeddings e índice gerados corretamente |
 | `api/main.py` | ✅ | Endpoints `/search`, `/similar`, `/health` funcionais |
+| Modelos dbt | ✅ | Staging, intermediate e mart versionados no repositório |
 | Dependências | ✅ | `fastapi`, `uvicorn`, `joblib`, `httpx` adicionados ao `pyproject.toml` |
-| `.env.example` | ✅ | Template com credenciais dbt criado |
+| `.env.example` | ✅ | Template com todas as variáveis necessárias (`DBT_DBNAME`) |
 
 ### ⚠️ Pontos de atenção (restantes)
 
 | Problema | Severidade | Recomendação |
 |---------|-----------|-------------|
-| **Modelos dbt não versionados** | 🔴 Alta | Adicionar arquivos `.sql` do dbt ao repositório; a tabela gold não é criada sem eles |
 | **Sem testes automatizados** | 🟡 Média | Adicionar testes para a API com `pytest` + `httpx` |
-| **Step numerado como "4"** | 🟢 Baixa | Renomear para `3_embeddings` para manter consistência sequencial |
-| **Sem `__init__.py` em `api/`** | 🟢 Baixa | Pode causar problemas de importação em alguns ambientes |
 
 ---
 
 ## 🛠️ Melhorias Futuras
 
-- [ ] Adicionar modelos dbt ao repositório (bloqueio principal para execução end-to-end)
 - [ ] Adicionar Docker Compose completo (PostgreSQL + API juntos)
 - [ ] Implementar cache para embeddings de queries repetidas
 - [ ] Suporte a re-indexação incremental (novos produtos)

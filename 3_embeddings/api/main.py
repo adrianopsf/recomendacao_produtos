@@ -20,7 +20,7 @@ if env_file:
     load_dotenv(env_file)
 
 # Permite sobrescrever o diretório de artefatos via .env
-ARTIFACTS_DIR = Path(os.getenv("EMB_ARTIFACTS_DIR", ROOT / "4_embeddings" / "artifacts"))
+ARTIFACTS_DIR = Path(os.getenv("EMB_ARTIFACTS_DIR", ROOT / "3_embeddings" / "artifacts"))
 EMB_PATH  = ARTIFACTS_DIR / "embeddings.npy"
 META_PATH = ARTIFACTS_DIR / "meta.csv"
 MODEL_PATH = ARTIFACTS_DIR / "nn_model.joblib"
