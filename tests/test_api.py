@@ -9,9 +9,6 @@ Cobre:
 """
 from __future__ import annotations
 
-import pytest
-
-
 # ── /health ───────────────────────────────────────────────────────────────────
 
 def test_health_ok(client):
