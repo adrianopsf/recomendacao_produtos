@@ -1,20 +1,48 @@
 services:
+  # ── Banco de dados PostgreSQL ────────────────────────────────────────────────
   postgres:
     image: postgres:latest
     container_name: dbt_postgres
+    env_file: .env
     environment:
       POSTGRES_USER: ${DBT_USER}
       POSTGRES_PASSWORD: ${DBT_PASSWORD}
-      POSTGRES_DB: dbt_db
+      POSTGRES_DB: ${DBT_DBNAME}
     ports:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DBT_USER} -d dbt_db"]
+      test: ["CMD-SHELL", "pg_isready -U ${DBT_USER} -d ${DBT_DBNAME}"]
       interval: 5s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
+
+  # ── API de Recomendação ──────────────────────────────────────────────────────
+  api:
+    build:
+      context: ..          # repo root como contexto de build
+      dockerfile: 3_embeddings/Dockerfile
+    container_name: recomendacao_api
+    ports:
+      - "8001:8001"
+    volumes:
+      # Monta os artefatos pré-gerados pelo build_index.py
+      - ../3_embeddings/artifacts:/app/3_embeddings/artifacts
+    environment:
+      EMB_ARTIFACTS_DIR: /app/3_embeddings/artifacts
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8001/health')\"",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
 
 volumes:
   postgres_data:
