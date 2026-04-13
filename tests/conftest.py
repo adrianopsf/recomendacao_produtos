@@ -6,6 +6,7 @@ Estratégia:
   - Mocka SentenceTransformer antes de inicializar o TestClient para que
     o startup da API não tente baixar o modelo.
 """
+
 from __future__ import annotations
 
 import os
@@ -38,7 +39,9 @@ def artifacts_dir(tmp_path_factory: pytest.TempPathFactory) -> Path:
     """Cria artefatos temporários com dados fictícios."""
     tmp = tmp_path_factory.mktemp("artifacts")
 
-    meta = pd.DataFrame(FAKE_PRODUCTS, columns=["product_id", "title", "category", "price", "image"])
+    meta = pd.DataFrame(
+        FAKE_PRODUCTS, columns=["product_id", "title", "category", "price", "image"]
+    )
     meta.to_csv(tmp / "meta.csv", index=False)
 
     rng = np.random.default_rng(42)
@@ -61,9 +64,9 @@ def client(artifacts_dir: Path):
     # Mock do modelo para evitar download e inferência real
     rng = np.random.default_rng(0)
     mock_model = MagicMock()
-    mock_model.encode.side_effect = lambda texts, **kw: (
-        rng.standard_normal((len(texts), EMB_DIM)).astype("float32")
-    )
+    mock_model.encode.side_effect = lambda texts, **kw: rng.standard_normal(
+        (len(texts), EMB_DIM)
+    ).astype("float32")
 
     # Importa app DEPOIS de setar a env var (ARTIFACTS_DIR é lido no startup)
     from api.main import app  # noqa: PLC0415

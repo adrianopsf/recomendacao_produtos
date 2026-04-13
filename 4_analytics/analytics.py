@@ -7,6 +7,7 @@ Uso direto:
   python analytics.py
   python analytics.py --meta /caminho/para/meta.csv
 """
+
 from __future__ import annotations
 
 import argparse
@@ -15,12 +16,11 @@ from pathlib import Path
 import duckdb
 import pandas as pd
 
-DEFAULT_META = (
-    Path(__file__).resolve().parents[1] / "3_embeddings" / "artifacts" / "meta.csv"
-)
+DEFAULT_META = Path(__file__).resolve().parents[1] / "3_embeddings" / "artifacts" / "meta.csv"
 
 
 # ── funções de análise ────────────────────────────────────────────────────────
+
 
 def top_categories(meta_path: str | Path = DEFAULT_META, limit: int = 10) -> pd.DataFrame:
     """Categorias com mais produtos e preço médio, ordenadas por volume."""
@@ -81,6 +81,7 @@ def price_histogram(meta_path: str | Path = DEFAULT_META, bins: int = 5) -> pd.D
 
 
 # ── relatório completo ────────────────────────────────────────────────────────
+
 
 def full_report(meta_path: str | Path = DEFAULT_META) -> None:
     """Imprime relatório completo no terminal."""

@@ -4,6 +4,7 @@ Uso:
   python build_index.py               # reindexação completa
   python build_index.py --incremental # somente produtos novos
 """
+
 from __future__ import annotations
 
 import argparse
@@ -32,10 +33,7 @@ DBT_PORT = int(os.getenv("DBT_PORT", "5433"))
 DBT_DBNAME = os.getenv("DBT_DBNAME")
 DBT_USER = os.getenv("DBT_USER")
 DBT_PASSWORD = os.getenv("DBT_PASSWORD")
-DB_URL = (
-    f"postgresql+psycopg2://{DBT_USER}:{DBT_PASSWORD}"
-    f"@{DBT_HOST}:{DBT_PORT}/{DBT_DBNAME}"
-)
+DB_URL = f"postgresql+psycopg2://{DBT_USER}:{DBT_PASSWORD}@{DBT_HOST}:{DBT_PORT}/{DBT_DBNAME}"
 
 ARTIFACTS_DIR = HERE.parent / "artifacts"
 ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
@@ -119,9 +117,7 @@ def main() -> None:
         print(f"[incremental] Gerando embeddings para {len(new_df)} produtos novos...")
         new_emb = _encode(new_df, model)
         all_emb = np.vstack([np.load(EMB_PATH), new_emb])
-        all_meta = pd.concat(
-            [existing_meta, new_df[_META_COLS]], ignore_index=True
-        )
+        all_meta = pd.concat([existing_meta, new_df[_META_COLS]], ignore_index=True)
     else:
         df = _load_gold()
         if df.empty:

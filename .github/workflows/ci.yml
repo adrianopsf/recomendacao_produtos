@@ -8,21 +8,21 @@ on:
 
 jobs:
   # ── Lint + Testes ────────────────────────────────────────────────────────────
+  # Python 3.12 fixado para coincidir com 1_local_setup/.python-version (3.12.1)
+  # O uv.lock foi gerado com esse interpretador; usar outra versão forçaria
+  # o uv a baixar o Python correto de qualquer forma.
   lint-and-test:
-    name: Lint & Test (Python ${{ matrix.python-version }})
+    name: Lint & Test
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.11", "3.12"]
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.12"
 
       - name: Install uv
         run: pip install uv --no-cache-dir

@@ -7,6 +7,7 @@ Endpoints:
   POST /reindex             — recarrega artefatos do disco
   GET  /analytics           — análises ad-hoc dos produtos via DuckDB
 """
+
 from __future__ import annotations
 
 import os
@@ -149,9 +150,7 @@ def _embed_query(query: str) -> np.ndarray:
     if hit is not None:
         return hit
 
-    vec = np.asarray(
-        MODEL.encode([query], normalize_embeddings=True), dtype="float32"
-    )
+    vec = np.asarray(MODEL.encode([query], normalize_embeddings=True), dtype="float32")
 
     with _cache_lock:
         _cache[query] = vec
@@ -251,9 +250,7 @@ def analytics():
     con = duckdb.connect()
 
     try:
-        total = con.execute(
-            f"SELECT COUNT(*) FROM read_csv_auto('{meta_path}')"
-        ).fetchone()[0]
+        total = con.execute(f"SELECT COUNT(*) FROM read_csv_auto('{meta_path}')").fetchone()[0]
 
         cats_df = con.execute(
             f"SELECT category, COUNT(*) AS produtos, ROUND(AVG(price), 2) AS preco_medio "

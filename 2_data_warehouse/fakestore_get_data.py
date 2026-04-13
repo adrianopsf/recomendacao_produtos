@@ -19,6 +19,7 @@ DB_URL = f"postgresql+psycopg2://{DBT_USER}:{DBT_PASSWORD}@{DBT_HOST}:{DBT_PORT}
 
 PRODUCTS_URL = "https://fakestoreapi.com/products"
 
+
 def fetch_products():
     r = requests.get(PRODUCTS_URL, timeout=30)
     r.raise_for_status()
@@ -26,25 +27,29 @@ def fetch_products():
     rows = []
     for p in products:
         rating = p.get("rating") or {}
-        rows.append({
-            "product_id": p.get("id"),
-            "title": p.get("title"),
-            "description": p.get("description"),
-            "category": p.get("category"),
-            "price": p.get("price"),
-            "image": p.get("image"),
-            "rating_rate": rating.get("rate"),
-            "rating_count": rating.get("count"),
-        })
+        rows.append(
+            {
+                "product_id": p.get("id"),
+                "title": p.get("title"),
+                "description": p.get("description"),
+                "category": p.get("category"),
+                "price": p.get("price"),
+                "image": p.get("image"),
+                "rating_rate": rating.get("rate"),
+                "rating_count": rating.get("count"),
+            }
+        )
     df = pd.DataFrame(rows).drop_duplicates(subset=["product_id"]).sort_values("product_id")
     df["price"] = pd.to_numeric(df["price"], errors="coerce")
     df["rating_rate"] = pd.to_numeric(df["rating_rate"], errors="coerce")
     df["rating_count"] = pd.to_numeric(df["rating_count"], errors="coerce")
     return df
 
+
 def ensure_schema_and_table(conn):
     conn.execute(text("CREATE SCHEMA IF NOT EXISTS bronze;"))
-    conn.execute(text("""
+    conn.execute(
+        text("""
         CREATE TABLE IF NOT EXISTS bronze.products_raw (
             product_id   INTEGER PRIMARY KEY,
             title        TEXT,
@@ -55,7 +60,9 @@ def ensure_schema_and_table(conn):
             rating_rate  NUMERIC,
             rating_count NUMERIC
         );
-    """))
+    """)
+    )
+
 
 def upsert_products(df: pd.DataFrame):
     engine = create_engine(DB_URL, future=True)
@@ -64,7 +71,8 @@ def upsert_products(df: pd.DataFrame):
         # staging substituída a cada execução
         df.to_sql("_products_stage", con=conn, schema="bronze", if_exists="replace", index=False)
         # upsert idempotente
-        conn.execute(text("""
+        conn.execute(
+            text("""
             INSERT INTO bronze.products_raw AS t
                 (product_id, title, description, category, price, image, rating_rate, rating_count)
             SELECT product_id, title, description, category, price, image, rating_rate, rating_count
@@ -77,8 +85,10 @@ def upsert_products(df: pd.DataFrame):
                 image        = EXCLUDED.image,
                 rating_rate  = EXCLUDED.rating_rate,
                 rating_count = EXCLUDED.rating_count;
-        """))
+        """)
+        )
         conn.execute(text("DROP TABLE IF EXISTS bronze._products_stage;"))
+
 
 def main():
     print(">> Buscando produtos na Fake Store API...")
@@ -86,6 +96,7 @@ def main():
     print(f">> {len(df)} produtos obtidos.")
     upsert_products(df)
     print(">> Bronze atualizado: bronze.products_raw")
+
 
 if __name__ == "__main__":
     main()

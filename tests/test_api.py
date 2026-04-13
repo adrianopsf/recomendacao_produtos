@@ -7,9 +7,11 @@ Cobre:
   - POST /reindex
   - GET /analytics
 """
+
 from __future__ import annotations
 
 # ── /health ───────────────────────────────────────────────────────────────────
+
 
 def test_health_ok(client):
     r = client.get("/health")
@@ -20,6 +22,7 @@ def test_health_ok(client):
 
 
 # ── /search ───────────────────────────────────────────────────────────────────
+
 
 def test_search_returns_results(client):
     r = client.get("/search", params={"query": "t-shirt", "k": 3})
@@ -74,6 +77,7 @@ def test_search_offset_beyond_total_returns_empty(client):
 
 # ── /similar ──────────────────────────────────────────────────────────────────
 
+
 def test_similar_returns_results(client):
     r = client.get("/similar/1", params={"k": 3})
     assert r.status_code == 200
@@ -97,6 +101,7 @@ def test_similar_not_found(client):
 
 # ── /reindex ──────────────────────────────────────────────────────────────────
 
+
 def test_reindex(client):
     r = client.post("/reindex")
     assert r.status_code == 200
@@ -106,6 +111,7 @@ def test_reindex(client):
 
 
 # ── /analytics ────────────────────────────────────────────────────────────────
+
 
 def test_analytics_structure(client):
     r = client.get("/analytics")
@@ -140,6 +146,7 @@ def test_analytics_category_counts(client):
 
 
 # ── analytics module (DuckDB standalone) ─────────────────────────────────────
+
 
 def test_analytics_module(artifacts_dir):
     """Testa o módulo 4_analytics/analytics.py diretamente."""
